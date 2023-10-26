@@ -1,0 +1,27 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Team {
+  id    Int    @id @unique @default(autoincrement())
+  apiId Int    @unique @map("api_id")
+  name  String
+
+  @@map("team")
+}
+
+model Player {
+  id    Int    @id @unique @default(autoincrement())
+  apiId Int    @unique @map("api_id")
+  name  String
+
+  @@map("player")
+}

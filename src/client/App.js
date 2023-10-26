@@ -1,12 +1,23 @@
-import "./App.css"
-import useSearchPlayers from "./client/hooks/useSearchPlayers"
 import { Box, Button, Stack, TextField, Typography } from "@mui/material"
 import { useState } from "react"
-import useSearchTeams from "./client/hooks/useSearchTeams"
+import useSearchTeams from "./hooks/useSearchTeams"
+import useSearchPlayers from "./hooks/useSearchPlayers"
 
+const betTypes = [
+  "Passing Yards",
+  "Passing Touchdowns",
+  "Receiving Yards",
+  "Receiving Touchdowns",
+  "Rushing Yards",
+  "Rushing Touchdowns",
+]
 function App() {
   const [team, setTeam] = useState()
   const [player, setPlayer] = useState()
+  const [stat, setStat] = useState()
+  const [amount, setAmount] = useState("")
+  const [stake, setStake] = useState("")
+  const [overUnder, setOverUnder] = useState()
   const [teamSearchVal, setTeamSearchVal] = useState("")
   const [playerSearchVal, setPlayerSearchVal] = useState("")
   const { data: teams, refetch: refetchTeams } = useSearchTeams({
@@ -19,6 +30,7 @@ function App() {
   console.log({ teams })
   const searchTeams = () => {
     refetchTeams()
+    console.log({ teams })
   }
 
   const searchPlayers = () => {
@@ -31,6 +43,14 @@ function App() {
   const selectPlayer = (player) => {
     setPlayer(player)
   }
+
+  const handleOver = () => {
+    setOverUnder("over")
+  }
+
+  const handleUnder = () => {
+    setOverUnder("under")
+  }
   return (
     <div className="App">
       <p>Get Team</p>
@@ -41,7 +61,7 @@ function App() {
         />
         <Button onClick={searchTeams}>Search Team</Button>
       </Box>
-      {teams && (
+      {teams && teams.length > 0 && (
         <Stack>
           {teams?.map((team) => {
             return <Button onClick={() => selectTeam(team)}>{team.name}</Button>
@@ -79,6 +99,42 @@ function App() {
             width={100}
             src={player.image}
           />
+          <Typography>Stat</Typography>
+          {betTypes?.map((type) => (
+            <Button onClick={() => setStat(type)}>{type}</Button>
+          ))}
+        </Stack>
+      )}
+      {stat && (
+        <Stack>
+          <Typography>You have selected {stat}!</Typography>
+          <TextField
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+          <Box>
+            <Button onClick={handleOver}>Over</Button>
+            <Button onClick={handleUnder}>Under</Button>
+          </Box>
+        </Stack>
+      )}
+      {amount && overUnder && (
+        <Stack>
+          <Typography>
+            {" "}
+            You have selected {overUnder === "over" ? "Over" : "Under"} {amount}{" "}
+            {stat} for {player.name}!
+          </Typography>
+          <TextField value={stake} onChange={(e) => setStake(e.target.value)} />
+          <Button onClick={handleUnder}>Lock in!</Button>
+        </Stack>
+      )}
+      {stake && (
+        <Stack>
+          <Typography>
+            Your bet: {overUnder === "over" ? "Over" : "Under"} {amount} {stat}{" "}
+            for {player.name} for ${stake}
+          </Typography>
         </Stack>
       )}
       <Button onClick={() => console.log(players)}>Console Log</Button>

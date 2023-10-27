@@ -34,6 +34,7 @@ const searchTeams = async (req, res) => {
               await prisma.team.create({
                 data: {
                   apiId: team.id,
+                  apiImage: team.image,
                   name: team.name,
                 },
               })
@@ -45,13 +46,16 @@ const searchTeams = async (req, res) => {
             name: {
               contains: search,
             },
+            id: {
+              lt: 35,
+            },
           },
         })
       }
     }
     return res.json({
       message: "Successfully searched teams",
-      data: teams.filter((team) => team.id < 35),
+      data: teams,
     })
   } catch (err) {
     return errorHandler(res, err, "Error fetching chat counts")

@@ -11,17 +11,51 @@ datasource db {
 }
 
 model Team {
-  id    Int    @id @unique @default(autoincrement())
-  apiId Int    @unique @map("api_id")
-  name  String
+  id       Int     @id @unique @default(autoincrement())
+  apiId    Int     @unique @map("api_id")
+  apiImage String?
+  name     String
+  Bet      Bet[]
 
   @@map("team")
 }
 
 model Player {
-  id    Int    @id @unique @default(autoincrement())
-  apiId Int    @unique @map("api_id")
-  name  String
+  id       Int     @id @unique @default(autoincrement())
+  apiId    Int     @unique @map("api_id")
+  apiImage String?
+  name     String
+  Bet      Bet[]
 
   @@map("player")
+}
+
+model Bet {
+  id        Int    @id @unique @default(autoincrement())
+  teamId    Int    @map("team_id")
+  playerId  Int    @map("player_id")
+  typeId    Int    @map("type_id")
+  amount    String
+  risk      String
+  win       String
+  overUnder String
+
+  Team    Team     @relation(fields: [teamId], references: [id])
+  Player  Player   @relation(fields: [playerId], references: [id])
+  BetType BetTypes @relation(fields: [typeId], references: [id])
+}
+
+model BetTypes {
+  id       Int            @id @unique @default(autoincrement())
+  name     String
+  category StatCategories
+  Bet      Bet[]
+}
+
+enum StatCategories {
+  PASSING
+  RUSHING
+  RECEIVING
+  DEFENSE
+  SCORING
 }

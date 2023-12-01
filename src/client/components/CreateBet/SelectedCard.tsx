@@ -5,7 +5,7 @@ const SelectedCard = ({
   name,
   onClick,
 }: {
-  image: string
+  image: string | null
   name: string
   onClick: () => void
 }) => {
@@ -25,7 +25,11 @@ const SelectedCard = ({
           alignItems: "center",
         }}
       >
-        <CardMedia image={image} sx={{ height: 60, width: 150, ml: 2 }} />
+        {image ? (
+          <CardMedia image={image} sx={{ height: 60, width: 150, ml: 2 }} />
+        ) : (
+          <Box width="150px" height="60px" />
+        )}
         <Typography variant="h4">{name}</Typography>
         <Button onClick={onClick} sx={{ width: "150px", mr: 2 }}>
           Change

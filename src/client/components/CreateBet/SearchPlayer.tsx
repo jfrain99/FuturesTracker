@@ -35,7 +35,7 @@ const SearchPlayer = () => {
     queryClient.setQueriesData("search-players", undefined)
   }
 
-  console.log({ players })
+  console.log({ players, player, team, bool: !players && !player && team })
   return (
     <>
       <Box
@@ -44,7 +44,7 @@ const SearchPlayer = () => {
         justifyContent={"center"}
         alignItems="center"
       >
-        <Collapse in={!players && !player} timeout={600}>
+        <Collapse in={!players && !player && team} timeout={600}>
           <TextField
             value={playerSearchVal}
             onChange={(e) => setPlayerSearchVal(e.target.value)}

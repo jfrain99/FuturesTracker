@@ -14,12 +14,14 @@ const SearchTeam = () => {
   const { setValue, watch } = useFormContext()
   const team = watch("team") as Team
   const [teamSearchVal, setTeamSearchVal] = useState("")
+  const [teamSearchOpen, setTeamSearchOpen] = useState(true)
 
   const { data: teams, refetch: refetchTeams } = useSearchTeams({
     search: teamSearchVal,
   })
   const searchTeams = () => {
     refetchTeams()
+    setTeamSearchOpen(false)
   }
   const selectTeam = (team: Team) => {
     setValue("team", team)
@@ -30,6 +32,7 @@ const SearchTeam = () => {
   const handleRetry = () => {
     setValue("team", null)
     queryClient.setQueriesData("search-teams", [])
+    setTeamSearchOpen(true)
   }
   console.log({ team })
   return (
@@ -40,7 +43,7 @@ const SearchTeam = () => {
         justifyContent={"center"}
         alignItems="center"
       >
-        <Collapse in={teams?.length === 0 && !team} timeout={600}>
+        <Collapse in={teamSearchOpen} timeout={600}>
           <TextField
             value={teamSearchVal}
             onChange={(e) => setTeamSearchVal(e.target.value)}
@@ -54,7 +57,7 @@ const SearchTeam = () => {
             onClick={teams?.length !== 0 ? handleRetry : searchTeams}
             sx={{ mt: 2 }}
           >
-            {teams?.length !== 0 ? "Retry" : "Search Team"}
+            {teams?.length !== 0 && !teamSearchOpen ? "Retry" : "Search Team"}
           </Button>
         </Collapse>
         {teams && teams.length > 0 && (

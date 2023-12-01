@@ -19,6 +19,8 @@ import { ControlledTextField } from "../components/form/ControlledTextField"
 import SearchTeam from "../components/CreateBet/SearchTeam"
 import { useCreateBetContext } from "../contexts/CreateBetContext"
 import SearchPlayer from "../components/CreateBet/SearchPlayer"
+import SelectStat from "../components/CreateBet/SelectStat"
+import SelectStake from "../components/CreateBet/SelectStake"
 
 interface Form {
   team: Team | null
@@ -53,7 +55,6 @@ const CreateBet = () => {
   const win = formMethods.watch("win")
   const overUnder = formMethods.watch("overUnder")
   const code = formMethods.watch("code")
-  const { data: betTypes } = useGetBetTypes()
 
   const createBetMutation = useCreateBet()
 
@@ -95,40 +96,11 @@ const CreateBet = () => {
   }
   return (
     <FormProvider {...formMethods}>
-      <Stack mt={2} spacing={1}>
+      <Stack mt={2} spacing={1} justifyContent={"center"} alignItems={"center"}>
         <SearchTeam />
         <SearchPlayer />
-        {step === 2 && player && (
-          <Stack>
-            {betTypes?.map((type) => (
-              <Button
-                onClick={() => {
-                  formMethods.setValue("stat", type)
-                  setStep(3)
-                }}
-              >
-                {type.name}
-              </Button>
-            ))}
-          </Stack>
-        )}
-        {step > 2 && stat && (
-          <Box display={"flex"} justifyContent={"center"} alignItems={"center"}>
-            <Card
-              sx={{
-                width: "95%",
-                backgroundColor: "#F2F2F2",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <Box width="150px" height="60px" />
-              <Typography variant="h4">{stat.name}</Typography>
-              <Button sx={{ width: "150px" }}>Change</Button>
-            </Card>
-          </Box>
-        )}
+        <SelectStat />
+        <SelectStake />
         {step === 3 && stat && (
           <Stack>
             <Typography>You have selected {stat.name}!</Typography>

@@ -3,10 +3,26 @@ import { prisma } from "../../../../prismaConnection.js"
 
 const createBet = async (req, res) => {
   try {
-    const { stat: _stat, ...rest } = req.body
+    const { stat: _stat, code, ...rest } = req.body
+    let codeId = await prisma.code.findFirst({
+      where: {
+        name: code,
+      },
+      select: {
+        id: true,
+      },
+    })
+    if (!codeId?.id) {
+      codeId = await prisma.code.create({
+        data: {
+          name: code,
+        },
+      })
+    }
     const bet = await prisma.bet.create({
       data: {
         typeId: req.body.stat.id,
+        codeId: codeId.id,
         ...rest,
       },
     })

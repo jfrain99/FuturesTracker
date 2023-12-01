@@ -35,6 +35,7 @@ model Bet {
   teamId    Int    @map("team_id")
   playerId  Int    @map("player_id")
   typeId    Int    @map("type_id")
+  codeId    Int    @default(1) @map("code_id")
   amount    String
   risk      String
   win       String
@@ -43,6 +44,8 @@ model Bet {
   Team    Team     @relation(fields: [teamId], references: [id])
   Player  Player   @relation(fields: [playerId], references: [id])
   BetType BetTypes @relation(fields: [typeId], references: [id])
+  Stat    Stat?
+  code    Code     @relation(fields: [codeId], references: [id])
 }
 
 model BetTypes {
@@ -50,6 +53,20 @@ model BetTypes {
   name     String
   category StatCategories
   Bet      Bet[]
+}
+
+model Stat {
+  id     Int    @id @unique @default(autoincrement())
+  betId  Int    @unique @map("bet_id")
+  amount String
+
+  Bet Bet @relation(fields: [betId], references: [id])
+}
+
+model Code {
+  id   Int    @id @unique @default(autoincrement())
+  name String
+  Bets Bet[]
 }
 
 enum StatCategories {

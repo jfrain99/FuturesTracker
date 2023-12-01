@@ -1,159 +1,239 @@
-import { Box, Button, Stack, TextField, Typography } from "@mui/material"
+import {
+  Box,
+  Button,
+  Card,
+  CardMedia,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material"
 import React, { useState } from "react"
-import useSearchTeams from "../hooks/useSearchTeams"
 import useSearchPlayers from "../hooks/useSearchPlayers"
 import useCreateBet from "../hooks/useCreateBet"
 import useGetBetTypes from "../hooks/useGetBetTypes"
+import { Team } from "../types/Team"
+import { Player } from "../types/Player"
+import { Stat } from "../types/Bet"
+import { FormProvider, useForm } from "react-hook-form"
+import { ControlledTextField } from "../components/form/ControlledTextField"
+import SearchTeam from "../components/CreateBet/SearchTeam"
+import { useCreateBetContext } from "../contexts/CreateBetContext"
+import SearchPlayer from "../components/CreateBet/SearchPlayer"
 
+interface Form {
+  team: Team | null
+  player: Player | null
+  stat: Stat | null
+  amount: string
+  risk: string
+  win: string
+  overUnder: "Over" | "Under" | null
+  code: string
+}
 const CreateBet = () => {
-  const [team, setTeam] = useState()
-  const [player, setPlayer] = useState()
-  const [stat, setStat] = useState()
-  const [amount, setAmount] = useState("")
-  const [risk, setRisk] = useState("")
-  const [win, setWin] = useState("")
-  const [overUnder, setOverUnder] = useState()
-  const [teamSearchVal, setTeamSearchVal] = useState("")
-  const [playerSearchVal, setPlayerSearchVal] = useState("")
+  const formMethods = useForm<Form>({
+    defaultValues: {
+      team: null,
+      player: null,
+      stat: null,
+      amount: "",
+      risk: "",
+      win: "",
+      code: "",
+      overUnder: null,
+    },
+  })
+  const { step, setStep } = useCreateBetContext()
+  console.log(step)
+  const team = formMethods.watch("team")
+  const player = formMethods.watch("player")
+  const stat = formMethods.watch("stat")
+  const amount = formMethods.watch("amount")
+  const risk = formMethods.watch("risk")
+  const win = formMethods.watch("win")
+  const overUnder = formMethods.watch("overUnder")
+  const code = formMethods.watch("code")
   const { data: betTypes } = useGetBetTypes()
-  console.log(betTypes)
-  const { data: teams, refetch: refetchTeams } = useSearchTeams({
-    search: teamSearchVal,
-  })
-  const { data: players, refetch: refetchPlayers } = useSearchPlayers({
-    search: playerSearchVal,
-    teamId: team?.apiId,
-  })
 
   const createBetMutation = useCreateBet()
-  const searchTeams = () => {
-    refetchTeams()
-    console.log({ teams })
-  }
-
-  const searchPlayers = () => {
-    refetchPlayers()
-  }
-  const selectTeam = (team) => {
-    console.log({ team })
-    setTeam(team)
-  }
 
   const selectPlayer = (player) => {
-    console.log({ player })
-    setPlayer(player)
+    formMethods.setValue("player", player)
+    setStep(2)
   }
 
   const handleOver = () => {
-    setOverUnder("over")
+    formMethods.setValue("overUnder", "Over")
   }
 
   const handleUnder = () => {
-    setOverUnder("under")
+    formMethods.setValue("overUnder", "Under")
   }
 
+  const handleStartOver = () => {
+    // setTeamSearchVal("")
+    // setPlayerSearchVal("")
+    // refetchTeams()
+    // refetchPlayers()
+    formMethods.reset()
+    setStep(0)
+  }
   const handleSubmit = () => {
-    console.log({ team, player, amount, risk, win, stat, overUnder })
-    createBetMutation.mutateAsync({
-      teamId: team.id,
-      playerId: player.id,
-      amount,
-      risk,
-      win,
-      stat,
-      overUnder,
-    })
+    if (team && player && stat && amount && risk && win && overUnder) {
+      createBetMutation.mutateAsync({
+        teamId: team.id,
+        playerId: player.id,
+        amount,
+        risk,
+        win,
+        stat,
+        overUnder,
+        code,
+      })
+      setStep(6)
+    }
   }
   return (
-    <Box>
-      <Typography>Get Team</Typography>
-      <Box display="flex" justifyContent={"center"}>
-        <TextField
-          value={teamSearchVal}
-          onChange={(e) => setTeamSearchVal(e.target.value)}
-        />
-        <Button onClick={searchTeams}>Search Team</Button>
-      </Box>
-      {teams && teams.length > 0 && (
-        <Stack>
-          {teams?.map((team) => {
-            return <Button onClick={() => selectTeam(team)}>{team.name}</Button>
-          })}
-        </Stack>
-      )}
-      {team && (
-        <Stack>
-          <Typography>You have selected the {team.name}!</Typography>
-          <Box display="flex" justifyContent={"center"}>
-            <TextField
-              value={playerSearchVal}
-              onChange={(e) => setPlayerSearchVal(e.target.value)}
-            />
-            <Button onClick={searchPlayers}>Search Player</Button>
-          </Box>
-        </Stack>
-      )}
-      {players && (
-        <Stack>
-          {players?.map((player) => {
-            return (
-              <Button onClick={() => selectPlayer(player)}>
-                {player.name}
+    <FormProvider {...formMethods}>
+      <Stack mt={2} spacing={1}>
+        <SearchTeam />
+        <SearchPlayer />
+        {step === 2 && player && (
+          <Stack>
+            {betTypes?.map((type) => (
+              <Button
+                onClick={() => {
+                  formMethods.setValue("stat", type)
+                  setStep(3)
+                }}
+              >
+                {type.name}
               </Button>
-            )
-          })}
-        </Stack>
-      )}
-      {player && (
-        <Stack>
-          <Typography>You have selected {player.name}!</Typography>
-          <img
-            alt={`${player.id}-${player.name}`}
-            width={100}
-            src={player.apiImage}
-          />
-          <Typography>Stat</Typography>
-          {betTypes?.map((type) => (
-            <Button onClick={() => setStat(type)}>{type.name}</Button>
-          ))}
-        </Stack>
-      )}
-      {stat && (
-        <Stack>
-          <Typography>You have selected {stat.name}!</Typography>
-          <TextField
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-          <Box>
-            <Button onClick={handleOver}>Over</Button>
-            <Button onClick={handleUnder}>Under</Button>
+            ))}
+          </Stack>
+        )}
+        {step > 2 && stat && (
+          <Box display={"flex"} justifyContent={"center"} alignItems={"center"}>
+            <Card
+              sx={{
+                width: "95%",
+                backgroundColor: "#F2F2F2",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Box width="150px" height="60px" />
+              <Typography variant="h4">{stat.name}</Typography>
+              <Button sx={{ width: "150px" }}>Change</Button>
+            </Card>
           </Box>
-        </Stack>
-      )}
-      {amount && overUnder && (
-        <Stack>
-          <Typography>
-            {" "}
-            You have selected {overUnder === "over" ? "Over" : "Under"} {amount}{" "}
-            {stat.name} for {player.name}!
-          </Typography>
-          <TextField value={risk} onChange={(e) => setRisk(e.target.value)} />
+        )}
+        {step === 3 && stat && (
+          <Stack>
+            <Typography>You have selected {stat.name}!</Typography>
+            <ControlledTextField name="amount" control={formMethods.control} />
 
-          <TextField value={win} onChange={(e) => setWin(e.target.value)} />
-          <Button onClick={handleSubmit}>Lock in!</Button>
-        </Stack>
-      )}
-      {risk && (
-        <Stack>
-          <Typography>
-            Your bet: {overUnder === "over" ? "Over" : "Under"} {amount}{" "}
-            {stat.name} for {player.name} for ${risk}
-          </Typography>
-        </Stack>
-      )}
-      <Button onClick={() => console.log(players)}>Console Log</Button>
-    </Box>
+            <Box display="flex" justifyContent={"center"}>
+              <Button onClick={handleOver}>Over</Button>
+              <Button onClick={handleUnder}>Under</Button>
+            </Box>
+            <Button onClick={() => setStep(4)}>Submit</Button>
+          </Stack>
+        )}
+        {step > 3 && overUnder && amount && (
+          <Box display={"flex"} justifyContent={"center"} alignItems={"center"}>
+            <Card
+              sx={{
+                width: "95%",
+                backgroundColor: "#F2F2F2",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Box width="150px" height="60px" />
+              <Typography variant="h4">
+                {overUnder} {amount}
+              </Typography>
+              <Button sx={{ width: "150px" }}>Change</Button>
+            </Card>
+          </Box>
+        )}
+
+        {step === 4 && amount && overUnder && stat && player && (
+          <Stack>
+            <ControlledTextField name="risk" control={formMethods.control} />
+            <ControlledTextField name="win" control={formMethods.control} />
+            <Button onClick={() => setStep(5)}>Submit</Button>
+          </Stack>
+        )}
+        {step > 4 && risk && win && (
+          <Box display={"flex"} justifyContent={"center"} alignItems={"center"}>
+            <Card
+              sx={{
+                width: "95%",
+                backgroundColor: "#F2F2F2",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Box width="150px" height="60px" />
+              <Typography variant="h4">
+                ${risk} / ${win}
+              </Typography>
+              <Button sx={{ width: "150px" }}>Change</Button>
+            </Card>
+          </Box>
+        )}
+        {step === 5 && risk && win && amount && overUnder && stat && player && (
+          <Stack>
+            <Typography>
+              Enter your code! This allows us to group your bets. If you have no
+              code, make one!
+            </Typography>
+            <ControlledTextField name="code" control={formMethods.control} />
+            <Button onClick={handleSubmit}>Lock in!</Button>
+          </Stack>
+        )}
+        {step > 5 && code && (
+          <Box display={"flex"} justifyContent={"center"} alignItems={"center"}>
+            <Card
+              sx={{
+                width: "95%",
+                backgroundColor: "#F2F2F2",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Box width="150px" height="60px" />
+              <Typography variant="h4">{code}</Typography>
+              <Button sx={{ width: "150px" }}>Change</Button>
+            </Card>
+          </Box>
+        )}
+        {step === 6 &&
+          risk &&
+          win &&
+          amount &&
+          overUnder &&
+          stat &&
+          player &&
+          code && (
+            <Stack>
+              <Typography>Bet Submitted!</Typography>
+              <Typography>
+                Your bet: {overUnder} {amount} {stat.name} for {player.name} for
+                ${risk} / ${win}
+              </Typography>
+              <Typography>Code: {code}</Typography>
+              <Button onClick={handleStartOver}>Make a new bet!</Button>
+            </Stack>
+          )}
+      </Stack>
+    </FormProvider>
   )
 }
 export default CreateBet

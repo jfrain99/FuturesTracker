@@ -1,22 +1,17 @@
-import { Box, Tab, Tabs } from "@mui/material"
+import { Box } from "@mui/material"
 import CreateBet from "./pages/CreateBet"
 import { useState } from "react"
 
 import MyBetsPage from "./pages/MyBetsPage"
+import Navbar from "./components/Navbar"
+import { CreateBetProvider } from "./contexts/CreateBetContext"
 
 function App() {
   const [tabValue, setTabValue] = useState(0)
-  const handleChange = (_e, newValue) => {
-    setTabValue(newValue)
-  }
-
   return (
     <Box>
-      <Tabs value={tabValue} onChange={handleChange}>
-        <Tab label="Create Bet" value={0} />
-        <Tab label="My Bets" value={1} />
-      </Tabs>
-      {tabValue === 0 && <CreateBet />}
+      <Navbar tabValue={tabValue} setTabValue={setTabValue} />
+      <CreateBetProvider>{tabValue === 0 && <CreateBet />}</CreateBetProvider>
       {tabValue === 1 && <MyBetsPage />}
     </Box>
   )

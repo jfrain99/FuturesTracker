@@ -1,5 +1,6 @@
 import {  useQuery } from "react-query"
 import TeamService from "../api/Services/teamService"
+import { Team } from "../types/Team"
 
 const searchTeams = async ({search}: {search: string}) => {
   return TeamService.get("/", { params: {
@@ -8,7 +9,7 @@ const searchTeams = async ({search}: {search: string}) => {
       
 }
 const useSearchTeams = ({search,}: {search: string}) => {
-    return useQuery(["search-teams"], () => searchTeams({search}), {
+    return useQuery<Team[]>(["search-teams"], () => searchTeams({search}), {
         refetchOnWindowFocus: false,
         enabled: false
     })

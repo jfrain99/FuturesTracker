@@ -5,12 +5,6 @@ import { prisma } from "../../../../prismaConnection.js"
 const searchPlayers = async (req, res) => {
   try {
     const { search, teamId } = req.query
-    if (search === "") {
-      return res.json({
-        message: "Successfully searched players",
-        data: [],
-      })
-    }
     let players = []
     players = await prisma.player.findMany({
       where: {
@@ -32,6 +26,7 @@ const searchPlayers = async (req, res) => {
       }
 
       players = await axios.request(options).then((res) => res.data.response)
+
       if (players.length > 0) {
         await Promise.all(
           players.map(async (player) => {

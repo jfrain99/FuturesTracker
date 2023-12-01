@@ -5,6 +5,12 @@ import { prisma } from "../../../../prismaConnection.js"
 const searchTeams = async (req, res) => {
   try {
     const { search } = req.query
+    if (search === "") {
+      return res.json({
+        message: "Successfully searched teams",
+        data: [],
+      })
+    }
     let teams = []
     teams = await prisma.team.findMany({
       where: {
@@ -34,7 +40,7 @@ const searchTeams = async (req, res) => {
               await prisma.team.create({
                 data: {
                   apiId: team.id,
-                  apiImage: team.image,
+                  apiImage: team.logo,
                   name: team.name,
                 },
               })

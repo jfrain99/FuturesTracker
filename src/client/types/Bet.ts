@@ -17,13 +17,24 @@ export interface BetType {
       category: BetTypes
       name: string
     }
+    code: {
+      id: number
+      name: string
+    }
     amount: string
     overUnder: string
     risk: string
     win: string
     playerId: number
     teamId: number
-    stats: Statistics[] 
+    stat: string
+    currValue?: string
+    seasonProgress?: number
+    progress?: number
+    expectedValue?: string
+    expectedPace?: number
+    betWinning?: boolean
+    betAlreadyWon?: boolean
   }
 
 export interface Statistics {

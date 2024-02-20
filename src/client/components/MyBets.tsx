@@ -13,7 +13,8 @@ const MyBets = ({ bets }: { bets: BetType[] }) => {
   const CURRENT_WEEK =
     Math.floor(dayjs().diff(dayjs("2023-10-31 03:00 AM")) / WEEK) + 9
   const betsWithValues = bets.map((bet) => {
-    const currValue = bet?.stat
+    console.log({ bet })
+    const currValue = parseInt(bet?.stat?.replace(/,/g, ""))
     const goal = Math.ceil(Number(bet.amount))
     const seasonProgress = (CURRENT_WEEK / TOTAL_WEEKS) * 100
     const progress = (Number(currValue) / goal) * 100

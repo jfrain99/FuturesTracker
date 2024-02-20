@@ -15,10 +15,12 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess"
 const Bet = ({ bet }: { bet: BetType }) => {
   const [collapseOpen, setCollapseOpen] = useState(false)
 
+  console.log({ bet })
   return (
     <Box
       display="flex"
       border="1px solid black"
+      sx={{ backgroundColor: "#DDDDDD" }}
       flexDirection={"column"}
       borderRadius={4}
       px={2}

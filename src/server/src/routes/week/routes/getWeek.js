@@ -5,6 +5,7 @@ import { prisma } from "../../../../prismaConnection.js"
 const searchPlayers = async (req, res) => {
   try {
     const { search, teamId } = req.query
+    const apiKey = process.env.API_KEY
     let players = []
     players = await prisma.player.findMany({
       where: {
@@ -19,8 +20,7 @@ const searchPlayers = async (req, res) => {
         url: "https://api-american-football.p.rapidapi.com/players",
         params: { search, team: teamId, season: "2023" },
         headers: {
-          "X-RapidAPI-Key":
-            "46f0fdf551msh9094c4f085a134ep184946jsn689833af3b3e",
+          "X-RapidAPI-Key": apiKey,
           "X-RapidAPI-Host": "api-american-football.p.rapidapi.com",
         },
       }

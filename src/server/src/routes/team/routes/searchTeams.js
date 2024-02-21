@@ -5,6 +5,7 @@ import { prisma } from "../../../../prismaConnection.js"
 const searchTeams = async (req, res) => {
   try {
     const { search } = req.query
+    const apiKey = process.env.API_KEY
     if (search === "") {
       return res.json({
         message: "Successfully searched teams",
@@ -25,8 +26,7 @@ const searchTeams = async (req, res) => {
         url: "https://api-american-football.p.rapidapi.com/teams",
         params: { search },
         headers: {
-          "X-RapidAPI-Key":
-            "46f0fdf551msh9094c4f085a134ep184946jsn689833af3b3e",
+          "X-RapidAPI-Key": apiKey,
           "X-RapidAPI-Host": "api-american-football.p.rapidapi.com",
         },
       }

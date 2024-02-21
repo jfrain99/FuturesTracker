@@ -4,6 +4,7 @@ import { prisma } from "../../../../prismaConnection.js"
 
 const getPlayerStats = async (req, res, bets) => {
   try {
+    const apiKey = process.env.API_KEY
     const betsWithStats = await Promise.all(
       bets.map(async (bet) => {
         const stat = await prisma.stat.findFirst({
@@ -23,8 +24,7 @@ const getPlayerStats = async (req, res, bets) => {
             season: "2023",
           },
           headers: {
-            "X-RapidAPI-Key":
-              "46f0fdf551msh9094c4f085a134ep184946jsn689833af3b3e",
+            "X-RapidAPI-Key": apiKey,
             "X-RapidAPI-Host": "api-american-football.p.rapidapi.com",
           },
         }
